@@ -49,38 +49,6 @@ Agricultural diseases in bean crops can significantly impact yield and quality. 
 
 ![Architecture Diagram](docs/architecture_diagram.png)
 
-### Data Flow
-
-```mermaid
-graph TB
-    A[Kaggle Dataset] --> B[Data Loading]
-    B --> C{Development Path}
-    C -->|Exploration| D[Jupyter Notebook<br/>pytorch_image.ipynb]
-    C -->|Training| E[Training Pipeline<br/>train.py]
-    
-    E --> F[Data Preprocessing<br/>Transforms]
-    F --> G[Model Training<br/>ResNet18]
-    G --> H[Model Evaluation]
-    H --> I[Model Saving<br/>model.pkl]
-    
-    I --> J[Flask API Service<br/>predict.py]
-    
-    J --> K{Endpoints}
-    K --> L[GET /health]
-    K --> M[POST /predict]
-    K --> N[POST /predict_base64]
-    K --> O[GET /info]
-    
-    J --> P[Docker Container]
-    P --> Q[HTTP Requests]
-    Q --> R[Users/Clients]
-    
-    style A fill:#e1f5ff
-    style E fill:#fff3e0
-    style I fill:#f3e5f5
-    style J fill:#e8f5e9
-    style P fill:#e3f2fd
-```
 
 ### Components
 
