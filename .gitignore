@@ -146,7 +146,8 @@ bean-leaf-lesions-classification/
 *.pt
 *.h5
 *.pkl
-*.ckpt
+# Note: If your model.pkl is small enough (<50MB), you can commit it
+# Otherwise, use Git LFS or provide download instructions in README
 
 # IDE
 .vscode/

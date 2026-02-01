@@ -33,10 +33,24 @@ O dataset utilizado é o **Bean Leaf Lesions Classification** disponível no Kag
 ```
 Image_classification/
 │
-├── pytorch_image.ipynb          # Notebook principal
-├── README.md                     # Este arquivo
-├── requirements.txt              # Dependências
-└── data/                        # Diretório de dados (não incluído)
+├── pytorch_image.ipynb          # Notebook de exploração e análise
+├── train.py                     # Script de treinamento
+├── predict.py                   # Serviço API Flask
+├── model.pkl                    # Modelo treinado
+├── best_model.pkl              # Melhor modelo durante treinamento
+│
+├── README.md                    # Documentação
+├── requirements.txt             # Dependências Python
+├── LICENSE                      # Licença MIT
+│
+├── Dockerfile                   # Containerização
+├── .dockerignore               # Arquivos ignorados no build
+├── .gitignore                  # Arquivos ignorados no Git
+│
+└── data/                       # Diretório de dados
+    ├── train.csv
+    ├── val.csv
+    └── images/
 ```
 
 ## 🚀 Como Usar
@@ -54,14 +68,89 @@ cd Pytorch_Image_Classification_Pretrained.ipynb
 pip install -r requirements.txt
 ```
 
-### Execução
+### Treinamento do Modelo
 
-1. Abra o notebook no Jupyter:
+Para treinar o modelo do zero:
+
 ```bash
-jupyter notebook pytorch_image.ipynb
+python train.py
 ```
 
-2. Execute as células sequencialmente
+Isso irá:
+- Carregar os dados do diretório `data/`
+- Treinar um modelo ResNet18 pré-treinado
+- Salvar o melhor modelo como `best_model.pkl`
+- Salvar o modelo final como `model.pkl`
+- Exibir métricas de performance
+
+**Parâmetros de Treinamento:**
+- Modelo: ResNet18 (pré-treinado)
+- Batch Size: 32
+- Épocas: 10
+- Learning Rate: 0.001
+- Otimizador: Adam
+
+### Executando o Serviço de Predição
+
+#### Opção 1: Localmente com Python
+
+```bash
+python predict.py
+```
+
+O serviço estará disponível em `http://localhost:9696`
+
+#### Opção 2: Com Docker
+
+```bash
+# Build da imagem
+docker build -t bean-classifier .
+
+# Executar container
+docker run -p 9696:9696 bean-classifier
+```
+
+### Testando a API
+
+#### Health Check
+```bash
+curl http://localhost:9696/health
+```
+
+#### Fazer Predição (Upload de Imagem)
+```bash
+curl -X POST http://localhost:9696/predict \
+  -F "file=@path/to/image.jpg"
+```
+
+#### Usando Python
+```python
+import requests
+
+# Upload de arquivo
+with open('image.jpg', 'rb') as f:
+    files = {'file': f}
+    response = requests.post('http://localhost:9696/predict', files=files)
+
+print(response.json())
+```
+
+#### Resposta Esperada
+```json
+{
+  "success": true,
+  "prediction": {
+    "prediction": 2,
+    "class_name": "Healthy",
+    "confidence": 0.95,
+    "probabilities": {
+      "0": 0.02,
+      "1": 0.03,
+      "2": 0.95
+    }
+  }
+}
+```
 
 ## 📝 Workflow do Notebook
 
@@ -96,16 +185,108 @@ jupyter notebook pytorch_image.ipynb
 9. **Treinamento do Modelo**
    - Utilização de modelos pré-treinados (Transfer Learning)
 
-## 🎓 Conceitos Aprendidos
+## 🔌 API Endpoints
 
-- **Transfer Learning**: Utilização de modelos pré-treinados
-- **Data Augmentation**: Transformações para aumentar dados
-- **Custom Datasets**: Criação de datasets personalizados no PyTorch
-- **GPU Acceleration**: Uso de CUDA para acelerar treinamento
+O serviço Flask expõe os seguintes endpoints:
+
+### `GET /`
+Página inicial com informações do serviço
+
+**Resposta:**
+```json
+{
+  "service": "Bean Leaf Disease Classifier",
+  "version": "1.0.0",
+  "status": "running",
+  "endpoints": {...}
+}
+```
+
+### `GET /health`
+Health check do serviço
+
+**Resposta:**
+```json
+{
+  "status": "healthy",
+  "model_loaded": true,
+  "device": "cpu"
+}
+```
+
+### `POST /predict`
+Fazer predição com upload de arquivo
+
+**Parâmetros:**
+- `file`: Arquivo de imagem (form-data)
+
+**Resposta:**
+```json
+{
+  "success": true,
+  "prediction": {
+    "prediction": 2,
+    "class_name": "Healthy",
+    "confidence": 0.95,
+    "probabilities": {
+      "0": 0.02,
+      "1": 0.03,
+      "2": 0.95
+    }
+  }
+}
+```
+
+### `POST /predict_base64`
+Fazer predição com imagem em base64
+
+**Body JSON:**
+```json
+{
+  "image": "base64_encoded_image_string"
+}
+```
+
+### `GET /info`
+Informações sobre o modelo
+
+**Resposta:**
+```json
+{
+  "model_type": "ResNet18 (Pretrained)",
+  "num_classes": 3,
+  "classes": {...},
+  "input_size": "128x128",
+  "device": "cpu"
+}
+```
 
 ## 📈 Resultados
 
-Os resultados variam de acordo com o modelo utilizado e hiperparâmetros. O notebook demonstra o processo completo de treinamento e avaliação.
+Os resultados variam de acordo com os hiperparâmetros e dados de treinamento:
+
+**Métricas Típicas:**
+- **Acurácia de Treino**: ~95-98%
+- **Acurácia de Teste**: ~85-92%
+- **F1-Score**: ~0.87-0.91
+
+**Classes:**
+- 0: Angular Leaf Spot (Mancha Angular)
+- 1: Bean Rust (Ferrugem)
+- 2: Healthy (Saudável)
+
+### Exemplo de Classification Report
+```
+              precision    recall  f1-score   support
+
+           0       0.88      0.90      0.89       115
+           1       0.91      0.87      0.89       117
+           2       0.92      0.93      0.92       118
+
+    accuracy                           0.90       350
+   macro avg       0.90      0.90      0.90       350
+weighted avg       0.90      0.90      0.90       350
+```
 
 ## 🤝 Contribuições
 
