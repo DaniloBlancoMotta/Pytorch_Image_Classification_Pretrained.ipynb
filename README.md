@@ -1,5 +1,10 @@
 # PyTorch Image Classification with Pretrained Models
 
+[![CI/CD Pipeline](https://github.com/DaniloBlancoMotta/Pytorch_Image_Classification_Pretrained.ipynb/actions/workflows/ci.yml/badge.svg)](https://github.com/DaniloBlancoMotta/Pytorch_Image_Classification_Pretrained.ipynb/actions/workflows/ci.yml)
+[![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+
 ## 📋 Descrição
 
 Este projeto implementa classificação de imagens utilizando PyTorch e modelos pré-treinados. O foco é demonstrar como utilizar transfer learning para classificação de lesões em folhas de feijão.
@@ -27,6 +32,57 @@ O dataset utilizado é o **Bean Leaf Lesions Classification** disponível no Kag
 - Total de imagens: 1,167
 - Classes: 3 (balanceadas)
 - Divisão: 70% treino / 30% teste
+
+## 🏛️ Arquitetura da Aplicação
+
+### Diagrama Visual
+
+![Architecture Diagram](docs/architecture_diagram.png)
+
+### Fluxo de Dados
+
+```mermaid
+graph TB
+    A[Kaggle Dataset] --> B[Data Loading]
+    B --> C{Development Path}
+    C -->|Exploration| D[Jupyter Notebook<br/>pytorch_image.ipynb]
+    C -->|Training| E[Training Pipeline<br/>train.py]
+    
+    E --> F[Data Preprocessing<br/>Transforms]
+    F --> G[Model Training<br/>ResNet18]
+    G --> H[Model Evaluation]
+    H --> I[Model Saving<br/>model.pkl]
+    
+    I --> J[Flask API Service<br/>predict.py]
+    
+    J --> K{Endpoints}
+    K --> L[GET /health]
+    K --> M[POST /predict]
+    K --> N[POST /predict_base64]
+    K --> O[GET /info]
+    
+    J --> P[Docker Container]
+    P --> Q[HTTP Requests]
+    Q --> R[Users/Clients]
+    
+    style A fill:#e1f5ff
+    style E fill:#fff3e0
+    style I fill:#f3e5f5
+    style J fill:#e8f5e9
+    style P fill:#e3f2fd
+```
+
+### Componentes Principais
+
+| Componente | Arquivo | Descrição |
+|------------|---------|-----------|
+| 📊 **Data Source** | Kaggle | Dataset de lesões em folhas de feijão |
+| 📓 **Notebook** | `pytorch_image.ipynb` | Análise exploratória e experimentação |
+| 🎯 **Training** | `train.py` | Pipeline de treinamento do modelo |
+| 💾 **Model** | `model.pkl` | Modelo treinado salvo |
+| 🌐 **API Service** | `predict.py` | Serviço Flask para predições |
+| 🐳 **Container** | `Dockerfile` | Containerização da aplicação |
+| 🧪 **Tests** | `test_predict.py` | Testes unitários |
 
 ## 🏗️ Estrutura do Projeto
 
@@ -288,7 +344,96 @@ Os resultados variam de acordo com os hiperparâmetros e dados de treinamento:
 weighted avg       0.90      0.90      0.90       350
 ```
 
-## 🤝 Contribuições
+## � Testes
+
+O projeto inclui testes unitários e integração contínua.
+
+### Executar Testes Localmente
+
+```bash
+# Instalar pytest
+pip install pytest pytest-cov
+
+# Executar todos os testes
+pytest test_predict.py -v
+
+# Executar com cobertura
+pytest test_predict.py -v --cov=predict --cov-report=html
+
+# Visualizar relatório de cobertura
+open htmlcov/index.html
+```
+
+### Testes da API
+
+O arquivo `test_api.py` permite testar a API em execução:
+
+```bash
+# Iniciar o serviço
+python predict.py
+
+# Em outro terminal, executar testes
+python test_api.py path/to/test_image.jpg
+```
+
+## 🔄 CI/CD
+
+O projeto utiliza **GitHub Actions** para integração e deploy contínuos.
+
+### Pipeline Automatizado
+
+O pipeline executa em cada push ou pull request:
+
+1. **Test Job**
+   - Testa em Python 3.9, 3.10 e 3.11
+   - Executa testes unitários
+   - Gera relatório de cobertura
+   - Upload para Codecov
+
+2. **Lint Job**
+   - Verifica código com flake8
+   - Valida formatação com black
+
+3. **Docker Job**
+   - Build da imagem Docker
+   - Testa a imagem gerada
+
+### Verificar Status
+
+[![CI/CD Status](https://github.com/DaniloBlancoMotta/Pytorch_Image_Classification_Pretrained.ipynb/actions/workflows/ci.yml/badge.svg)](https://github.com/DaniloBlancoMotta/Pytorch_Image_Classification_Pretrained.ipynb/actions)
+
+## 📦 Gerenciamento de Dependências
+
+### Opção 1: pip (Simples)
+
+```bash
+pip install -r requirements.txt
+```
+
+### Opção 2: Pipenv (Recomendado)
+
+```bash
+# Instalar pipenv
+pip install pipenv
+
+# Instalar dependências
+pipenv install
+
+# Ativar ambiente
+pipenv shell
+
+# Instalar dependências de desenvolvimento
+pipenv install --dev
+```
+
+### Dependências Principais
+
+- **PyTorch**: Framework de Deep Learning
+- **Flask**: Framework web para API
+- **scikit-learn**: Machine Learning utilities
+- **pytest**: Framework de testes
+
+## �🤝 Contribuições
 
 Contribuições são bem-vindas! Sinta-se à vontade para:
 - Reportar bugs
