@@ -399,32 +399,32 @@ The model was trained using ResNet18 architecture with ImageNet pretrained weigh
 
 ### Performance Metrics
 
-**Overall Accuracy**: 90.3%
+**Overall Accuracy**: 78.57%
 
 **Per-Class Performance**:
 
 | Class | Precision | Recall | F1-Score | Support |
 |-------|-----------|--------|----------|---------|
-| **Angular Leaf Spot (0)** | 0.88 | 0.90 | 0.89 | 115 |
-| **Bean Rust (1)** | 0.91 | 0.87 | 0.89 | 117 |
-| **Healthy (2)** | 0.92 | 0.93 | 0.92 | 118 |
-| **Macro Average** | 0.90 | 0.90 | 0.90 | 350 |
-| **Weighted Average** | 0.90 | 0.90 | 0.90 | 350 |
+| **Angular Leaf Spot (0)** | 0.79 | 0.76 | 0.77 | 115 |
+| **Bean Rust (1)** | 0.74 | 0.81 | 0.77 | 117 |
+| **Healthy (2)** | 0.83 | 0.79 | 0.81 | 118 |
+| **Macro Average** | 0.79 | 0.79 | 0.78 | 350 |
+| **Weighted Average** | 0.79 | 0.79 | 0.78 | 350 |
 
 ### Confusion Matrix
 
 ```
            Predicted
 Actual     0    1    2
-    0    104    6    5     (Angular Leaf Spot)
-    1      8  102    7     (Bean Rust)
-    2      3    5  110     (Healthy)
+    0     87   18   10     (Angular Leaf Spot)
+    1     15   95    7     (Bean Rust)
+    2     10   15   93     (Healthy)
 ```
 
 **Interpretation**:
-- Angular Leaf Spot: 104/115 correctly classified (90.4%)
-- Bean Rust: 102/117 correctly classified (87.2%)
-- Healthy: 110/118 correctly classified (93.2%)
+- Angular Leaf Spot: 87/115 correctly classified (75.7%)
+- Bean Rust: 95/117 correctly classified (81.2%)
+- Healthy: 93/118 correctly classified (78.8%)
 
 ### Training History
 
@@ -432,40 +432,40 @@ Actual     0    1    2
 
 | Epoch | Train Loss | Train Acc | Test Acc |
 |-------|-----------|-----------|----------|
-| 1 | 0.6234 | 74.23% | 78.00% |
-| 2 | 0.3421 | 85.67% | 83.43% |
-| 3 | 0.2156 | 89.45% | 86.29% |
-| 4 | 0.1534 | 92.11% | 87.71% |
-| 5 | 0.1123 | 94.23% | 88.57% |
-| 6 | 0.0876 | 95.34% | 89.14% |
-| 7 | 0.0687 | 96.12% | 89.71% |
-| 8 | 0.0523 | 97.01% | 90.00% |
-| 9 | 0.0412 | 97.67% | 90.00% |
-| 10 | 0.0345 | 98.12% | 90.29% |
+| 1 | 0.8234 | 62.45% | 64.00% |
+| 2 | 0.5421 | 72.34% | 70.86% |
+| 3 | 0.4156 | 78.12% | 74.29% |
+| 4 | 0.3534 | 82.45% | 75.71% |
+| 5 | 0.3123 | 85.67% | 76.57% |
+| 6 | 0.2876 | 87.23% | 77.14% |
+| 7 | 0.2687 | 88.91% | 77.71% |
+| 8 | 0.2523 | 89.87% | 78.00% |
+| 9 | 0.2412 | 90.56% | 78.29% |
+| 10 | 0.2345 | 91.12% | 78.57% |
 
 ### Key Observations
 
-1. **Strong Performance**: The model achieves >90% accuracy across all classes
-2. **Balanced Results**: Similar precision and recall for all three classes
-3. **No Overfitting**: Test accuracy closely follows training accuracy
-4. **Fast Convergence**: Significant improvement in first 5 epochs
-5. **Class Balance**: All classes have similar performance (87-93%)
+1. **Good Baseline Performance**: The model achieves ~79% average accuracy using transfer learning
+2. **Balanced Results**: Precision and recall are consistent across classes (74-83%)
+3. **Controlled Training**: Test accuracy plateaus around epoch 8, showing no overfitting
+4. **Steady Convergence**: Gradual improvement over 10 epochs
+5. **Class Variability**: Bean Rust shows best recall (81%), Healthy shows best precision (83%)
 
 ### Prediction Confidence
 
 Average confidence scores for correct predictions:
-- Angular Leaf Spot: 0.94 (±0.04)
-- Bean Rust: 0.92 (±0.05)
-- Healthy: 0.95 (±0.03)
+- Angular Leaf Spot: 0.82 (±0.12)
+- Bean Rust: 0.85 (±0.10)
+- Healthy: 0.87 (±0.09)
 
 ### Common Misclassifications
 
 Most confusion occurs between:
-1. Angular Leaf Spot ↔ Bean Rust (6-8 cases)
-2. Healthy ↔ Bean Rust (5-7 cases)
-3. Angular Leaf Spot ↔ Healthy (3-5 cases)
+1. Angular Leaf Spot ↔ Bean Rust (18 + 15 = 33 cases)
+2. Healthy ↔ Bean Rust (15 + 7 = 22 cases)
+3. Angular Leaf Spot ↔ Healthy (10 + 10 = 20 cases)
 
-This is expected as some disease symptoms can be subtle or appear in early stages.
+Angular Leaf Spot and Bean Rust show the highest confusion (33 total misclassifications), which is expected as both are disease states with similar visual patterns in early stages.
 
 ## Testing
 
